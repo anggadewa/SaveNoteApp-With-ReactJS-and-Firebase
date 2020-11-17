@@ -2,6 +2,7 @@ import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import {
   addDataToAPI,
+  deleteDataFromAPI,
   getDataFromAPI,
   updateDataFromAPI,
 } from "../../../config/redux/action";
@@ -75,6 +76,17 @@ class Dashboard extends Component {
     });
   };
 
+  deleteNote = (e, note) => {
+    const { deleteDataFromAPI } = this.props;
+    const userData = JSON.parse(localStorage.getItem("userData"));
+    e.stopPropagation();
+    const data = {
+      uid: userData.uid,
+      noteId: note.id,
+    };
+    deleteDataFromAPI(data);
+  };
+
   render() {
     const { title, content, date, textButton } = this.state;
     const { updateNotes } = this;
@@ -119,6 +131,12 @@ class Dashboard extends Component {
                   <p className="title">{note.data.title}</p>
                   <p className="date">{note.data.date}</p>
                   <p className="content">{note.data.content}</p>
+                  <div
+                    className="delete-btn"
+                    onClick={(e) => this.deleteNote(e, note)}
+                  >
+                    x
+                  </div>
                 </div>
               );
             })}
@@ -141,6 +159,7 @@ const mapDispatchToProps = (dispatch) => {
     addDataToAPI: (data) => dispatch(addDataToAPI(data)),
     getDataFromAPI: (data) => dispatch(getDataFromAPI(data)),
     updateDataFromAPI: (data) => dispatch(updateDataFromAPI(data)),
+    deleteDataFromAPI: (data) => dispatch(deleteDataFromAPI(data)),
   };
 };
 

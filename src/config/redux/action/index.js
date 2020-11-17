@@ -140,3 +140,10 @@ export const updateDataFromAPI = (data) => (dispatch) => {
     );
   });
 };
+
+export const deleteDataFromAPI = (data) => (dispatch) => {
+  const url = database.ref(`notes/${data.uid}/${data.noteId}`);
+  return new Promise((resolve, reject) => {
+    url.remove();
+  });
+};
