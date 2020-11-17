@@ -25,6 +25,7 @@ class Login extends Component {
       .catch((err) => err);
     if (res) {
       console.log("Login Success");
+      localStorage.setItem("userData", JSON.stringify(res));
       setTimeout(() => {
         this.setState({
           email: "",

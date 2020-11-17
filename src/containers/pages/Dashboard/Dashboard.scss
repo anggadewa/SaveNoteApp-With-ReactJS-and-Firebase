@@ -43,6 +43,25 @@
       font-weight: bold;
       text-transform: uppercase;
       outline: none;
+      &:hover{
+        cursor: pointer;
+        background: green;
+        color: white;
+      }
+      &.cancel{
+        border: 2px solid orange;
+        color: orange;
+      }
+      &.cancel:hover {
+        cursor: pointer;
+        background: orange;
+        color: white;
+      }
+    }
+    .action-wrapper{
+      display: flex;
+      justify-content: space-between;
+      width: 40%;
     }
   }
   .card-content{
@@ -51,6 +70,12 @@
     padding: 16px;
     box-shadow: 4px 3px 9px rgba(0,0,0,0.1);
     margin-bottom: 16px;
+    transition: all ease 0.35s;
+    &:hover{
+      cursor: pointer;
+      transform: translateY(-2px);
+      box-shadow: 8px 7px 13px rgba(0, 0, 0, 0.5);
+    }
     p {
       margin: 0px;
     }

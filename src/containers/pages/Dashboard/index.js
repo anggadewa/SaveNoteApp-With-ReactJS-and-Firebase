@@ -1,6 +1,10 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
-import { addDataToAPI } from "../../../config/redux/action";
+import {
+  addDataToAPI,
+  getDataFromAPI,
+  updateDataFromAPI,
+} from "../../../config/redux/action";
 import "./Dashboard.scss";
 
 class Dashboard extends Component {
@@ -8,19 +12,40 @@ class Dashboard extends Component {
     title: "",
     content: "",
     date: "",
+    textButton: "Simpan",
+    noteId: "",
   };
 
+  componentDidMount() {
+    const userData = JSON.parse(localStorage.getItem("userData"));
+    this.props.getDataFromAPI(userData.uid);
+  }
+
   handleSaveNotes = () => {
-    const { title, content } = this.state;
-    const { addDataToAPI, user } = this.props;
+    const { title, content, textButton, noteId } = this.state;
+    const { addDataToAPI, user, updateDataFromAPI } = this.props;
+    const userData = JSON.parse(localStorage.getItem("userData"));
     const data = {
       title: title,
       content: content,
       date: new Date().getTime(),
-      uid: user.uid,
+      // uid: user.uid,
+      uid: userData.uid,
     };
-    addDataToAPI(data);
+    if (textButton === "Simpan") {
+      addDataToAPI(data);
+    } else {
+      data.noteId = noteId;
+      updateDataFromAPI(data);
+    }
     console.log(data);
+    this.setState({
+      title: "",
+      content: "",
+      date: "",
+      textButton: "Simpan",
+      noteId: "",
+    });
   };
 
   onInputChange = (e, type) => {
@@ -29,8 +54,32 @@ class Dashboard extends Component {
     });
   };
 
+  updateNotes = (note) => {
+    console.log(note);
+    this.setState({
+      title: note.data.title,
+      content: note.data.content,
+      date: new Date().getDate(),
+      textButton: "Update",
+      noteId: note.id,
+    });
+  };
+
+  cancelUpdate = () => {
+    this.setState({
+      title: "",
+      content: "",
+      date: "",
+      textButton: "SIMPAN",
+      noteId: "",
+    });
+  };
+
   render() {
-    const { title, content, date } = this.state;
+    const { title, content, date, textButton } = this.state;
+    const { updateNotes } = this;
+    const { notes } = this.props;
+    console.log(notes);
     return (
       <div className="container">
         <div className="input-form">
@@ -46,16 +95,35 @@ class Dashboard extends Component {
             value={content}
             onChange={(e) => this.onInputChange(e, "content")}
           ></textarea>
-          <button className="save-btn" onClick={this.handleSaveNotes}>
-            Simpan
-          </button>
+          <div className="action-wrapper">
+            {textButton === "Update" ? (
+              <button className="save-btn cancel" onClick={this.cancelUpdate}>
+                Cancel
+              </button>
+            ) : null}
+            <button className="save-btn" onClick={this.handleSaveNotes}>
+              {textButton}
+            </button>
+          </div>
         </div>
         <hr />
-        <div className="card-content">
-          <p className="title">Title</p>
-          <p className="date">16 Nov 2020</p>
-          <p className="content">Content Notes</p>
-        </div>
+        {notes.length > 0 ? (
+          <Fragment>
+            {notes.map((note) => {
+              return (
+                <div
+                  className="card-content"
+                  key={note.id}
+                  onClick={() => updateNotes(note)}
+                >
+                  <p className="title">{note.data.title}</p>
+                  <p className="date">{note.data.date}</p>
+                  <p className="content">{note.data.content}</p>
+                </div>
+              );
+            })}
+          </Fragment>
+        ) : null}
       </div>
     );
   }
@@ -64,12 +132,15 @@ class Dashboard extends Component {
 const mapStateToProps = (state) => {
   return {
     user: state.user,
+    notes: state.notes,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
     addDataToAPI: (data) => dispatch(addDataToAPI(data)),
+    getDataFromAPI: (data) => dispatch(getDataFromAPI(data)),
+    updateDataFromAPI: (data) => dispatch(updateDataFromAPI(data)),
   };
 };
 
